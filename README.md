@@ -77,46 +77,23 @@ DOopenclawYT/
 │   ├── memory/agent.md                # Personalidad mutable de Khai
 │   └── public/                        # Único directorio expuesto de salida de archivos
 ├── orchestrator.py                    # Servidor Webhook FastAPI
-└── deploy.ps1                         # Script de despliegue remoto seguro
 ```
 
 ---
 
-## 🚀 Despliegue en Producción
+## 💾 Respaldos de Base de Datos y Logs Locales (Makefile)
 
-El despliegue está automatizado mediante un flujo basado en **Git** y un repositorio bare remoto alojado en el droplet (`/srv/git/openclaw.git`).
+La base de datos SQLite activa (`data/openclaw.db`), los certificados y los logs (`data/logs/`, `data/agent_logs/`) están excluidos de Git para mantener el repositorio limpio y proteger información sensible de la interacción del agente.
 
-```bash
-# 1. Configurar credenciales localmente si no existen
-cp secrets.env.template secrets.env
-# Editar secrets.env con tus API Keys
+Para respaldar y restaurar de forma local los datos del sistema, se pueden utilizar los comandos implementados en el `Makefile` (los archivos `.tar.gz` resultantes están excluidos de Git en `.gitignore` para evitar subidas accidentales a GitHub):
 
-# 2. Ejecutar despliegue
-# (Detecta cambios sin confirmar localmente, crea un commit automático, hace push al bare repo,
-# actualiza la carpeta /app remota vía git pull y levanta contenedores con docker compose)
-.\deploy.ps1
-```
-
-### 💾 Respaldos de Base de Datos y Logs (Makefile)
-
-Para mantener el repositorio Git ligero y libre de conflictos binarios, la base de datos SQLite activa (`data/openclaw.db`), los certificados y los logs (`data/logs/`, `data/agent_logs/`) están excluidos de Git.
-
-Para respaldar y auditar de forma local los datos del servidor, se implementaron comandos en el `Makefile` que empaquetan la información en archivos `.tar.gz` (los cuales sí son trackeados al no estar ignorados):
-
-* **Sincronización de Base de Datos SQLite:**
+* **Respaldo de Base de Datos SQLite:**
   - `make backupdb`: Comprime la base de datos activa `data/openclaw.db` a `data/db_backup.tar.gz`.
   - `make restoredb`: Descomprime `data/db_backup.tar.gz` a `data/openclaw.db`.
 
-* **Sincronización de Registros de Logs:**
+* **Respaldo de Registros de Logs:**
   - `make backuplogs`: Crea un archivo comprimido `data/logs_backup.tar.gz` con el contenido de las carpetas de logs.
   - `make restorelogs`: Descomprime `data/logs_backup.tar.gz` en sus carpetas correspondientes.
-
-* **Flujo de Respaldo Bidireccional:**
-  1. En el Droplet (servidor): ejecuta `make backupdb && make backuplogs`.
-  2. En el Droplet, realiza `git add data/*_backup.tar.gz && git commit -m "Backup" && git push origin main`.
-  3. En tu PC local: ejecuta `git pull`.
-  4. En tu PC local: ejecuta `tar -xzf data/db_backup.tar.gz -C data` (o la herramienta de extracción que prefieras) para restaurar la base de datos y auditar los logs locales.
-
 
 ---
 

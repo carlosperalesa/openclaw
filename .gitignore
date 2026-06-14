@@ -5,6 +5,7 @@ data/certs/
 
 # Base de datos activa
 data/openclaw.db
+data/*.tar.gz
 
 # Logs en crudo (se respaldan comprimidos)
 data/logs/
