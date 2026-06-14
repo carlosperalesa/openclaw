@@ -1,0 +1,28 @@
+# config.yaml
+# Configuración centralizada para OpenClaw Framework
+
+# ===== SISTEMA =====
+timezone: America/Santiago
+log_level: INFO
+debug_mode: false
+
+# ===== RUTAS =====
+paths:
+  memory: data/memory
+  skills: data/skills
+  logs: data/logs
+  public: data/public
+
+# ===== APIS (Límites y Configuraciones) =====
+apis:
+  openai:
+    model: gpt-4.1-mini
+    timeout: 60
+  
+  telegram:
+    timeout_seconds: 1800 # 30 min long-polling timeout (si aplica)
+
+# ===== AGENTES CORE =====
+core:
+  heart_beat_fast: 10 # Segundos entre chequeo de zombies
+  heart_beat_slow: 60 # Segundos entre chequeo de recursos

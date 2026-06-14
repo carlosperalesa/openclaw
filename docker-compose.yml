@@ -1,0 +1,41 @@
+services:
+  bot:
+    build: .
+    container_name: openclaw_core
+    restart: unless-stopped
+    env_file:
+      - .env
+      - secrets.env
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+    volumes:
+      # Persistencia para que no se borren los videos ni la base de datos al reiniciar
+      - ./data:/app/data
+      # Montamos las skills y modulos por si quieres editarlas en vivo en el servidor
+      - ./modules:/app/modules
+      - ./config:/app/config
+      - ./orchestrator.py:/app/orchestrator.py
+    environment:
+      - TZ=America/Santiago
+      - PROXY_URL=http://docker_proxy:8001/run-skill
+    networks:
+      - openclaw_net
+
+  docker_proxy:
+    build: ./docker_proxy
+    container_name: openclaw_docker_proxy
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=America/Santiago
+      - HOST_DATA_DIR=${PWD:-.}/data
+      - HOST_MODULES_DIR=${PWD:-.}/modules
+      - HOST_ENV_FILE=${PWD:-.}/.env
+    networks:
+      - openclaw_net
+
+networks:
+  openclaw_net:
+    driver: bridge

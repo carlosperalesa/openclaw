@@ -1,0 +1,20 @@
+# Entorno y Secretos
+.env
+secrets.env
+data/certs/
+
+# Base de datos activa
+data/openclaw.db
+
+# Logs en crudo (se respaldan comprimidos)
+data/logs/
+data/agent_logs/
+
+# Python y caché
+__pycache__/
+*.pyc
+.venv/
+.gemini/
+.idea/
+.vscode/
+*.log
